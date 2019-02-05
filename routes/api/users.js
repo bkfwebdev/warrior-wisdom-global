@@ -10,9 +10,29 @@ const User = require("../../models/Users");
 
 usersRouter.get("/test", (req, res) => res.json({ msg: "users works son!" }));
 
-//@route    GET api/users/registration
-//@desc     register user
-//@access   public
+
+usersRouter.post("/login", (req,res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    User.findOne({email})
+    .then(user => {
+        if(!user){
+            return res.status(404).json({email:"user not found"});
+
+        }
+
+        bcrypt.compare(password,user.password)
+        .then(isMatch => {
+            if(isMatch){
+                res.json({msg : "success"}); 
+            } else {
+                res.status(400).json({password : "password incorrect"}) 
+            }
+        })
+    }); 
+    
+});
 
 usersRouter.post("/register",(req,res) => { 
     User.findOne({email: req.body.email}).then (user => {
